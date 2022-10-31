@@ -1,0 +1,50 @@
+
+
+pipeline{
+    
+    
+  agent any 
+   tools {
+     maven 'maven 3.6.3'
+        }
+  
+    stages{
+		
+		stage('Build')
+		{
+			steps
+			
+			{
+			dir("CrmServices"){
+			sh 'mvn package -Dmaven.test.skip=true'
+			}
+			
+			}
+		
+		
+		}
+	
+	stage('Backup'){
+	    
+	    steps{
+	        
+	        sshPublisher(publishers: [sshPublisherDesc(configName: '71_opt_demo_1_server', sshCredentials: [encryptedPassphrase: '{AQAAABAAAAAQt5VBClVU+CL9OmVoIS3Mg6MLABrCH5X4PJCts1wjoRU=}', key: '', keyPath: '', username: 'covalense'], transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'mv /opt/demo_1_tomcat/apache-tomcat-8.5.42/webapps/csmart-crmservices.war /opt/demo_1_tomcat/war_backup/csmart-crmservices"`date +%Y-%m-%d-%H-%M-%S`".war'', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+	    
+		}
+	}	
+	
+	stage('Deploy'){
+	    
+	    steps{
+	        
+	        sshPublisher(publishers: [sshPublisherDesc(configName: '71_opt_demo_1_server', sshCredentials: [encryptedPassphrase: '{AQAAABAAAAAQt5VBClVU+CL9OmVoIS3Mg6MLABrCH5X4PJCts1wjoRU=}', key: '', keyPath: '', username: 'covalense'], transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: '', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: 'CrmServices/target', sourceFiles: '**/*.war')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+	    }
+	}
+		
+	
+       
+    
+}
+}
+
+
